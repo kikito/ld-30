@@ -2,8 +2,6 @@ local class = require 'lib.middleclass'
 local media = require 'media'
 
 
-local World = class('World')
-
 local TILE_WIDTH, TILE_HEIGHT = 32, 32
 
 local charQuadTranslation = {
@@ -41,24 +39,28 @@ local function getRegionRect(region)
   end
 end
 
-local function getWorldRect(world, region)
+local function getWorldLT(world, cx, cy)
 
-  local rl,rt,rw,rh = getRegionRect(region)
+  local w, h = world.width * TILE_WIDTH, world.height * TILE_HEIGHT
 
-  local ww, wh = world.width, world.height -- in tiles
-
-  ww, wh = ww * TILE_WIDTH, wh * TILE_HEIGHT
-
-  return rl + rw/2 - ww/2,
-         rt + rh/2 - wh/2,
-         ww,
-         wh
+  return cx - w/2, cy - h/2
 end
 
 local function getCellLT(world_l, world_t, x, y)
   return world_l + (x - 1) * TILE_WIDTH,
          world_t + (y - 1) * TILE_HEIGHT
 end
+
+local function getNextCoordinate(x,y,direction)
+  if direction == 'up'    then return x,y-1 end
+  if direction == 'down'  then return x,y+1 end
+  if direction == 'left'  then return x-1,y end
+  if direction == 'right' then return x+1,y end
+end
+
+------------
+
+local World = class('World')
 
 function World:initialize(world_data, region)
   self.region = region
@@ -85,8 +87,17 @@ function World:initialize(world_data, region)
   end
 end
 
-function World:draw(l,t)
+function World:draw()
+
   love.graphics.setColor(255,255,255)
+
+  local rl,rt,rw,rh = getRegionRect(self.region)
+  if self.active then
+    love.graphics.rectangle('fill', rl,rt,rw,rh)
+  end
+
+  local l,t = getWorldLT(self, rl + rw/2, rt + rh/2)
+
   for x = 1, self.width do
     for y = 1, self.height do
       local quad = getQuadFromChar(self.cells[y][x], self.region)
@@ -105,17 +116,74 @@ function World:draw(l,t)
   love.graphics.draw(media.img.atlas, player_quad, getCellLT(l,t,self.player.x, self.player.y))
 end
 
+function World:attemptMove(direction)
+  if not self.active then return end
+
+  local player = self.player
+
+  local next_player_x, next_player_y = getNextCoordinate(player.x, player.y, direction)
+
+  local ball = self:getBall(next_player_x, next_player_y)
+
+  if ball then
+    local next_ball_x, next_ball_y = getNextCoordinate(ball.x, ball.y, direction)
+    if self:isTraversable(next_ball_x, next_ball_y) then
+      local another_ball = self:getBall(next_ball_x, next_ball_y)
+      if another_ball then return false end
+      ball.x, ball.y = next_ball_x, next_ball_y
+      player.x, player.y = next_player_x, next_player_y
+
+      -- FIXME: test for win here
+    end
+  elseif self:isTraversable(next_player_x, next_player_y) then
+    player.x, player.y = next_player_x, next_player_y
+  end
+end
+
+function World:isOut(x,y)
+  return x < 1 or x > self.width or y < 1 or y > self.height
+end
+
+function World:getBall(x,y)
+  if self:isOut(x,y) then return nil end
+  local ball
+  for i=1, #self.balls do
+    ball = self.balls[i]
+    if ball.x == x and ball.y == y then return ball end
+  end
+end
+
+function World:isTraversable(x,y)
+  if self:isOut(x,y) then return false end
+  local char = self.cells[y][x]
+  return char ~= '#'
+end
+
+
+
+
 
 local Level = class('Level')
 
 function Level:initialize(map)
   self.up = World:new(map.up, 'up')
   self.down = World:new(map.down, 'down')
+  self.up.active = true
 end
 
 function Level:draw()
-  self.up:draw(getWorldRect(self.up, 'up'))
-  self.down:draw(getWorldRect(self.down, 'down'))
+  self.up:draw('up')
+  self.down:draw('down')
+end
+
+function Level:attemptMove(direction)
+  self.up:attemptMove(direction)
+  self.down:attemptMove(direction)
+end
+
+function Level:switchActiveWorld()
+  self.up.active = not self.up.active
+  self.down.active = not self.down.active
 end
 
 return Level
