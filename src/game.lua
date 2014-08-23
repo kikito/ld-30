@@ -1,6 +1,7 @@
-local class = require 'lib.middleclass'
+local class    = require 'lib.middleclass'
+local Stateful = require 'lib.stateful'
 
-local Game = class('Game')
+local Game = class('Game'):include(Stateful)
 
 function Game:initialize(media)
   self.media = media
@@ -15,7 +16,6 @@ function Game:draw()
 end
 
 function Game:keypressed(key)
-  if key == 'escape' then love.event.quit() end
 
 end
 
