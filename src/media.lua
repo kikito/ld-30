@@ -1,4 +1,6 @@
 local multisource = require 'lib.multisource'
+local Map         = require 'map'
+
 local media = {}
 
 local function newSource(name)
@@ -24,6 +26,10 @@ media.load = function()
 
   media.img = {
     human = love.graphics.newImage('img/human.png')
+  }
+
+  media.maps = {
+    map1 = Map:new('maps/map1.lua')
   }
 end
 
