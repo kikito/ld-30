@@ -18,12 +18,14 @@ function Play:keypressed(key)
 
   if key == 'up' or key == 'down' or key == 'right' or key == 'left' then
     self.level:attemptMove(key)
+    if self.level:isWon() then
+      self:gotoState('Win')
+    end
   end
 
-  if key == ' ' then
+  if key == ' ' or key == 'enter' or key == 'tab' then
     self.level:switchActiveWorld()
   end
-
 end
 
 function Play:exitedState()

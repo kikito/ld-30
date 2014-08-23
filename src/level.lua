@@ -133,11 +133,21 @@ function World:attemptMove(direction)
       ball.x, ball.y = next_ball_x, next_ball_y
       player.x, player.y = next_player_x, next_player_y
 
-      -- FIXME: test for win here
+      return true
     end
   elseif self:isTraversable(next_player_x, next_player_y) then
     player.x, player.y = next_player_x, next_player_y
   end
+end
+
+function World:isWon()
+  local ball, char
+  for i=1, #self.balls do
+    ball = self.balls[i]
+    char = self.cells[ball.y][ball.x]
+    if char ~= 'X' then return false end
+  end
+  return true
 end
 
 function World:isOut(x,y)
@@ -159,10 +169,6 @@ function World:isTraversable(x,y)
   return char ~= '#'
 end
 
-
-
-
-
 local Level = class('Level')
 
 function Level:initialize(map)
@@ -179,6 +185,10 @@ end
 function Level:attemptMove(direction)
   self.up:attemptMove(direction)
   self.down:attemptMove(direction)
+end
+
+function Level:isWon()
+  return self.up:isWon() and self.down:isWon()
 end
 
 function Level:switchActiveWorld()

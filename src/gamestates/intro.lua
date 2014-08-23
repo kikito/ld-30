@@ -7,7 +7,7 @@ function Intro:draw()
 end
 
 function Intro:keypressed(key)
-  if key == ' ' then
+  if key == ' ' or key == 'enter' then
     self:gotoState('Play')
   elseif key == 'escape' then
     love.event.quit()

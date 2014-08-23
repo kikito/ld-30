@@ -2,6 +2,7 @@ local Game = require 'game'
 
 require 'gamestates.intro'
 require 'gamestates.play'
+require 'gamestates.win'
 
 local media = require 'media'
 
