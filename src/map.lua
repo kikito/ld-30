@@ -20,7 +20,7 @@ local function parseWorldString(str)
     y=y+1
   end
 
-  result.height = y
+  result.height = y - 1
 
   return result
 end

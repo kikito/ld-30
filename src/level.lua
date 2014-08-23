@@ -1,4 +1,5 @@
 local class = require 'lib.middleclass'
+local media = require 'media'
 
 local Level = class('Level')
 
@@ -29,16 +30,42 @@ local function getWorldRect(world, region)
          wh
 end
 
+local charTranslation = {
+  up = {
+    ['@'] = 'human',
+    ['.'] = 'ground',
+    ['#'] = 'wall',
+    ['O'] = 'ball',
+    ['1'] = 'button',
+    ['X'] = 'goal'
+  },
+  down = {
+    ['@'] = 'demon',
+    ['.'] = 'hell_ground',
+    ['#'] = 'hell_wall',
+    ['O'] = 'hell_ball',
+    ['1'] = 'hell_button',
+    ['X'] = 'hell_goal'
+  }
+}
+
+
+local function getQuad(char, region)
+  local quadName = charTranslation[region][char]
+  return media.quads[quadName]
+end
+
 local function drawWorld(world, region)
   local l,t,w,h = getWorldRect(world, region)
 
+  love.graphics.setColor(255,255,255)
   for x = 1, world.width do
     for y = 1, world.height do
-      love.graphics.rectangle('line',
-                              l + (x - 1) * TILE_WIDTH,
-                              t + (y - 1) * TILE_HEIGHT,
-                              TILE_WIDTH,
-                              TILE_HEIGHT)
+      local quad = getQuad(world.cells[y][x], region)
+      love.graphics.draw(media.img.atlas,
+                         quad,
+                         l + (x - 1) * TILE_WIDTH,
+                         t + (y - 1) * TILE_HEIGHT)
     end
   end
 end
