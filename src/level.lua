@@ -1,9 +1,10 @@
-local class    = require 'lib.middleclass'
-local media    = require 'media'
-local Pusher   = require 'pusher'
-local Ball     = require 'ball'
-local MetaBall = require 'meta_ball'
-local Button   = require 'button'
+local class       = require 'lib.middleclass'
+local media       = require 'media'
+local Pusher      = require 'pusher'
+local MetaPusher  = require 'meta_pusher'
+local Ball        = require 'ball'
+local MetaBall    = require 'meta_ball'
+local Button      = require 'button'
 
 
 local TILE_WIDTH, TILE_HEIGHT = 32, 32
@@ -16,7 +17,8 @@ local charQuadTranslation = {
     ['O'] = 'ball',
     ['_'] = 'button',
     ['X'] = 'goal',
-    ['0'] = 'meta_ball'
+    ['0'] = 'meta_ball',
+    ['&'] = 'meta_pusher'
   },
   hell = {
     ['@'] = 'demon',
@@ -25,7 +27,8 @@ local charQuadTranslation = {
     ['O'] = 'hell_ball',
     ['_'] = 'hell_button',
     ['X'] = 'hell_goal',
-    ['0'] = 'meta_ball'
+    ['0'] = 'meta_ball',
+    ['&'] = 'meta_pusher'
   }
 }
 
@@ -79,6 +82,10 @@ function World:initialize(level, world_data, region, button_callbacks)
         if self.pusher then error('Two pushers defined on the same world') end
         self.pusher = Pusher:new(self, x, y)
         char = '.'
+      elseif char == '&' then
+        if self.pusher then error('Two pushers defined on the same world') end
+        self.pusher = MetaPusher:new(self, x, y)
+        char = '.'
       elseif char == 'O' then
         self.balls[#self.balls + 1] = Ball:new(self, x, y)
         char = '.'
@@ -86,7 +93,7 @@ function World:initialize(level, world_data, region, button_callbacks)
         self.balls[#self.balls + 1] = MetaBall:new(self, x, y)
         char = '.'
       elseif tonumber(char) then
-        local callback = assert(button_callbacks[n], 'missing button callback: '.. char)
+        local callback = assert(button_callbacks[tonumber(char)], 'missing button callback: '.. char)
         self.buttons[#self.buttons + 1] = Button:new(self, x, y, callback)
         char = '_'
       end
@@ -113,15 +120,16 @@ function World:draw()
     end
   end
 
-  local ball, char, ball_quad
+  local ball, ball_char, ball_quad
   for i=1,#self.balls do
     ball = self.balls[i]
-    char = ball.class.name == 'Ball' and 'O' or '0'
-    ball_quad = getQuadFromChar(char, self.region)
+    ball_char = ball.class.name == 'Ball' and 'O' or '0'
+    ball_quad = getQuadFromChar(ball_char, self.region)
     love.graphics.draw(media.img.atlas, ball_quad, getCellLT(l,t, ball.x, ball.y))
   end
 
-  local pusher_quad = getQuadFromChar('@', self.region)
+  local pusher_char = self.pusher.class.name == 'Pusher' and '@' or '&'
+  local pusher_quad = getQuadFromChar(pusher_char, self.region)
   love.graphics.draw(media.img.atlas, pusher_quad, getCellLT(l,t,self.pusher.x, self.pusher.y))
 end
 
@@ -134,9 +142,8 @@ end
 
 function World:attemptMove(direction)
   if not self.active then return end
-  if self.pusher:attemptMove(direction) then
-    self:checkButtons()
-  end
+  self.pusher:attemptMove(direction)
+  self.level:checkButtons()
 end
 
 function World:isWon()
@@ -234,6 +241,11 @@ end
 function Level:switchActiveWorld()
   self.earth.active = not self.earth.active
   self.hell.active = not self.hell.active
+end
+
+function Level:checkButtons()
+  self.earth:checkButtons()
+  self.hell:checkButtons()
 end
 
 return Level

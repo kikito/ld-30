@@ -9,7 +9,8 @@ end
 
 function Pusher:move(direction)
   self.x, self.y = self.world:getNextCoordinate(self.x, self.y, direction)
-  return true
+  local ball = self.world:getBall(self.x, self.y)
+  if ball then ball:move(direction) end
 end
 
 function Pusher:canMove(direction)
@@ -24,8 +25,6 @@ end
 function Pusher:attemptMove(direction)
   if self:canMove(direction) then
     self:move(direction)
-    local ball = self.world:getBall(self.x, self.y)
-    if ball then ball:move(direction) end
     return true
   end
 end

@@ -49,7 +49,8 @@ media.load = function()
     hell_ball    = newQuad(4,2, atlas),
     hell_button  = newQuad(5,2, atlas),
     hell_goal    = newQuad(6,2, atlas),
-    meta_ball    = newQuad(4,3, atlas)
+    meta_ball    = newQuad(4,3, atlas),
+    meta_pusher  = newQuad(1,3, atlas)
   }
 end
 
