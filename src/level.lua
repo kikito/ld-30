@@ -1,5 +1,7 @@
 local class = require 'lib.middleclass'
 local media = require 'media'
+local Pusher = require 'pusher'
+local Ball   = require 'ball'
 
 
 local TILE_WIDTH, TILE_HEIGHT = 32, 32
@@ -52,10 +54,7 @@ local function getCellLT(world_l, world_t, x, y)
 end
 
 local function getNextCoordinate(x,y,direction)
-  if direction == 'up'    then return x,y-1 end
-  if direction == 'down'  then return x,y+1 end
-  if direction == 'left'  then return x-1,y end
-  if direction == 'right' then return x+1,y end
+
 end
 
 ------------
@@ -75,11 +74,11 @@ function World:initialize(world_data, region)
     for x=1, self.width do
       local char = world_data.cells[y][x]
       if     char == '@' then
-        if self.player then error('Two players defined on the same world') end
-        self.player = {x=x,y=y}
+        if self.pusher then error('Two pushers defined on the same world') end
+        self.pusher = Pusher:new(self, x, y)
         char = '.'
       elseif char == 'O' then
-        self.balls[#self.balls + 1] = {x=x,y=y}
+        self.balls[#self.balls + 1] = Ball:new(self, x, y)
         char = '.'
       end
       self.cells[y][x] = char
@@ -112,32 +111,20 @@ function World:draw()
     love.graphics.draw(media.img.atlas, ball_quad, getCellLT(l,t, ball.x, ball.y))
   end
 
-  local player_quad = getQuadFromChar('@', self.region)
-  love.graphics.draw(media.img.atlas, player_quad, getCellLT(l,t,self.player.x, self.player.y))
+  local pusher_quad = getQuadFromChar('@', self.region)
+  love.graphics.draw(media.img.atlas, pusher_quad, getCellLT(l,t,self.pusher.x, self.pusher.y))
+end
+
+function World:getNextCoordinate(x,y,direction)
+  if direction == 'up'    then return x,y-1 end
+  if direction == 'down'  then return x,y+1 end
+  if direction == 'left'  then return x-1,y end
+  return x+1,y
 end
 
 function World:attemptMove(direction)
   if not self.active then return end
-
-  local player = self.player
-
-  local next_player_x, next_player_y = getNextCoordinate(player.x, player.y, direction)
-
-  local ball = self:getBall(next_player_x, next_player_y)
-
-  if ball then
-    local next_ball_x, next_ball_y = getNextCoordinate(ball.x, ball.y, direction)
-    if self:isTraversable(next_ball_x, next_ball_y) then
-      local another_ball = self:getBall(next_ball_x, next_ball_y)
-      if another_ball then return false end
-      ball.x, ball.y = next_ball_x, next_ball_y
-      player.x, player.y = next_player_x, next_player_y
-
-      return true
-    end
-  elseif self:isTraversable(next_player_x, next_player_y) then
-    player.x, player.y = next_player_x, next_player_y
-  end
+  self.pusher:attemptMove(direction)
 end
 
 function World:isWon()
