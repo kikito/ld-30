@@ -3,15 +3,29 @@ local Ball = require 'ball'
 
 local MetaBall = class('MetaBall', Ball)
 
-function MetaBall:initialze(world, x, y)
+function MetaBall:initialize(world, x, y)
   Ball.initialize(self, world, x, y)
-  -- FIXME: pair with sister metaball
-end
 
+  local twin_world = world:getTweenWorld()
+
+  if twin_world then
+    local twin = twin_world:getBall(x,y)
+    if not twin then error("missing metaball twin") end
+    self.twin = twin
+    twin.twin = self
+  end
+end
 
 function MetaBall:canMove(direction)
-  return false
+  return Ball.canMove(self, direction)
+     and Ball.canMove(self.twin, direction)
 end
+
+function MetaBall:move(direction)
+  Ball.move(self, direction)
+  Ball.move(self.twin, direction)
+end
+
 
 return MetaBall
 

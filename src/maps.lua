@@ -25,7 +25,7 @@ return {
       ......
     ]],
     buttons = {
-      function(level, state)
+      [1] = function(level, state)
         level.earth:toggleWall(5,3)
       end
     }
@@ -38,15 +38,10 @@ return {
       .....#...
     ]],
     hell = [[
-      ...##....
-      .@.##....
-      ..0##..X.
-      .........
-    ]],
-    buttons = {
-      function(level, state)
-        level.earth:toggleWall(5,3)
-      end
-    }
+      ...###..#
+      .@.#....#
+      ..0....X#
+      #########
+    ]]
   }
 }

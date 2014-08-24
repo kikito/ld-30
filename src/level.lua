@@ -57,10 +57,6 @@ local function getCellLT(world_l, world_t, x, y)
          world_t + (y - 1) * TILE_HEIGHT
 end
 
-local function getNextCoordinate(x,y,direction)
-
-end
-
 ------------
 
 local World = class('World')
@@ -206,6 +202,11 @@ function World:toggleWall(x,y)
   else
     error('can not toggle wall ' .. x ..','.. y .. ': invalid char - ' .. char)
   end
+end
+
+function World:getTweenWorld()
+  local level = self.level
+  return self.region == 'earth' and level.hell or level.earth
 end
 
 local Level = class('Level')
