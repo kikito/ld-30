@@ -1,8 +1,9 @@
-local class = require 'lib.middleclass'
-local media = require 'media'
-local Pusher = require 'pusher'
-local Ball   = require 'ball'
-local Button = require 'button'
+local class    = require 'lib.middleclass'
+local media    = require 'media'
+local Pusher   = require 'pusher'
+local Ball     = require 'ball'
+local MetaBall = require 'meta_ball'
+local Button   = require 'button'
 
 
 local TILE_WIDTH, TILE_HEIGHT = 32, 32
@@ -14,7 +15,8 @@ local charQuadTranslation = {
     ['#'] = 'wall',
     ['O'] = 'ball',
     ['_'] = 'button',
-    ['X'] = 'goal'
+    ['X'] = 'goal',
+    ['0'] = 'meta_ball'
   },
   hell = {
     ['@'] = 'demon',
@@ -22,14 +24,15 @@ local charQuadTranslation = {
     ['#'] = 'hell_wall',
     ['O'] = 'hell_ball',
     ['_'] = 'hell_button',
-    ['X'] = 'hell_goal'
+    ['X'] = 'hell_goal',
+    ['0'] = 'meta_ball'
   }
 }
 
 
 local function getQuadFromChar(char, region)
-  local quadName = charQuadTranslation[region][char]
-  return media.quads[quadName]
+  local quad_name = charQuadTranslation[region][char]
+  return media.quads[quad_name]
 end
 
 local function getRegionRect(region)
@@ -83,8 +86,11 @@ function World:initialize(level, world_data, region, button_callbacks)
       elseif char == 'O' then
         self.balls[#self.balls + 1] = Ball:new(self, x, y)
         char = '.'
+      elseif char == '0' then
+        self.balls[#self.balls + 1] = MetaBall:new(self, x, y)
+        char = '.'
       elseif tonumber(char) then
-        local callback = assert(button_callbacks[tonumber(char)], 'missing button callback: '.. char)
+        local callback = assert(button_callbacks[n], 'missing button callback: '.. char)
         self.buttons[#self.buttons + 1] = Button:new(self, x, y, callback)
         char = '_'
       end
@@ -111,10 +117,11 @@ function World:draw()
     end
   end
 
-  local ball_quad = getQuadFromChar('O', self.region)
-
+  local ball, char, ball_quad
   for i=1,#self.balls do
-    local ball = self.balls[i]
+    ball = self.balls[i]
+    char = ball.class.name == 'Ball' and 'O' or '0'
+    ball_quad = getQuadFromChar(char, self.region)
     love.graphics.draw(media.img.atlas, ball_quad, getCellLT(l,t, ball.x, ball.y))
   end
 
@@ -150,6 +157,11 @@ function World:isOut(x,y)
   return x < 1 or x > self.width or y < 1 or y > self.height
 end
 
+function World:getPusher(x,y)
+  local pusher = self.pusher
+  if pusher.x == x and pusher.y == y then return pusher end
+end
+
 function World:getBall(x,y)
   if self:isOut(x,y) then return nil end
   local ball
@@ -165,13 +177,18 @@ function World:isTraversable(x,y)
   return char ~= '#'
 end
 
+function World:isEmpty(x,y)
+  return self:isTraversable(x, y)
+    and not self:getPusher(x, y)
+    and not self:getBall(x, y)
+end
+
 function World:checkButtons()
   local button
-  local pusher = self.pusher
   for i=1, #self.buttons do
     button = self.buttons[i]
-    if button.x == pusher.x and button.y == pusher.y
-       or self:getBall(button.x, button.y)
+    if self:getPusher(button.x, button.y)
+    or self:getBall(button.x, button.y)
     then
       button:press()
     else
