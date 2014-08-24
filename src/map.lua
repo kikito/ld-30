@@ -28,8 +28,8 @@ end
 function Map:initialize(path)
   local info = love.filesystem.load(path)()
 
-  self.up = parseWorldString(info.up)
-  self.down = parseWorldString(info.down)
+  self.earth = parseWorldString(info.earth)
+  self.hell = parseWorldString(info.hell)
   self.buttons = info.buttons
 end
 

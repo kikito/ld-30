@@ -1,11 +1,11 @@
-local up = [[
+local earth = [[
 ....#...
 .@..#...
 ..O...X.
 ....#...
 ]]
 
-local down = [[
+local hell = [[
 ........
 .@##.##.
 ..##O##.
@@ -13,11 +13,11 @@ local down = [[
 ]]
 
 return {
-  up = up,
-  down = down,
+  earth = earth,
+  hell = hell,
   buttons = function(button, state)
     if button == "1" and state == "pressed" then
-      print('FIXME: remove block from up')
+      print('FIXME: remove block from earth')
     end
   end
 }

@@ -5,7 +5,7 @@ local media = require 'media'
 local TILE_WIDTH, TILE_HEIGHT = 32, 32
 
 local charQuadTranslation = {
-  up = {
+  earth = {
     ['@'] = 'human',
     ['.'] = 'ground',
     ['#'] = 'wall',
@@ -13,7 +13,7 @@ local charQuadTranslation = {
     ['1'] = 'button',
     ['X'] = 'goal'
   },
-  down = {
+  hell = {
     ['@'] = 'demon',
     ['.'] = 'hell_ground',
     ['#'] = 'hell_wall',
@@ -32,7 +32,7 @@ end
 local function getRegionRect(region)
   local w,h = love.graphics.getDimensions()
 
-  if region == 'up' then
+  if region == 'earth' then
     return 0,0,w,h/2
   else
     return 0,h/2,w,h/2
@@ -172,28 +172,28 @@ end
 local Level = class('Level')
 
 function Level:initialize(map)
-  self.up = World:new(map.up, 'up')
-  self.down = World:new(map.down, 'down')
-  self.up.active = true
+  self.earth = World:new(map.earth, 'earth')
+  self.hell = World:new(map.hell, 'hell')
+  self.earth.active = true
 end
 
 function Level:draw()
-  self.up:draw('up')
-  self.down:draw('down')
+  self.earth:draw('earth')
+  self.hell:draw('hell')
 end
 
 function Level:attemptMove(direction)
-  self.up:attemptMove(direction)
-  self.down:attemptMove(direction)
+  self.earth:attemptMove(direction)
+  self.hell:attemptMove(direction)
 end
 
 function Level:isWon()
-  return self.up:isWon() and self.down:isWon()
+  return self.earth:isWon() and self.hell:isWon()
 end
 
 function Level:switchActiveWorld()
-  self.up.active = not self.up.active
-  self.down.active = not self.down.active
+  self.earth.active = not self.earth.active
+  self.hell.active = not self.hell.active
 end
 
 return Level
