@@ -72,6 +72,7 @@ function World:initialize(level, world_data, region, button_callbacks)
 
   self.cells = {}
   self.balls = {}
+  self.goals = {}
   self.buttons = {}
 
   for y=1, self.height do
@@ -92,6 +93,8 @@ function World:initialize(level, world_data, region, button_callbacks)
       elseif char == '0' then
         self.balls[#self.balls + 1] = MetaBall:new(self, x, y)
         char = '.'
+      elseif char == 'X' then
+        self.goals[#self.goals + 1] = {x=x,y=y}
       elseif tonumber(char) then
         local callback = assert(button_callbacks[tonumber(char)], 'missing button callback: '.. char)
         self.buttons[#self.buttons + 1] = Button:new(self, x, y, callback)
@@ -149,11 +152,11 @@ function World:attemptMove(direction)
 end
 
 function World:isWon()
-  local ball, char
-  for i=1, #self.balls do
-    ball = self.balls[i]
-    char = self.cells[ball.y][ball.x]
-    if char ~= 'X' then return false end
+  local goal, ball
+  for i=1, #self.goals do
+    goal = self.goals[i]
+    ball = self:getBall(goal.x, goal.y)
+    if not ball then return false end
   end
   return true
 end
