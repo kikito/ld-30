@@ -1,4 +1,5 @@
 return {
+--[=[
   { earth = [[
       ....#...
       .@..#...
@@ -135,37 +136,43 @@ return {
       end
     }
   },
+]=]
   { earth = [[
-      @.#....###
-      ..#.2...3.
-      ##......0.
-      ....###...
-      ...#...#..
-      ...#.5.#..
+      @.#...####
+      X.#.2.#...
+      ##....#.3.
+      .....##...
+      ...##..#O.
+      .0.#.5.#..
+      ..X#...#..
     ]],
     hell = [[
       ..........
+      X....6....
       ..........
-      ........0.
       ##########
-      .4.#...#.1
-      ...#.X.#.@
+      .4.#...#O1
+      .0.#.X.#.@
+      ...#...#..
     ]],
     buttons = {
       [1] = function(level, state)
         level.earth:toggleWall(3,2)
       end,
       [2] = function(level, state)
-        level.hell:toggleWall(11,4)
+        level.hell:toggleWall(9,4)
       end,
       [3] = function(level, state)
-        level.hell:toggleWall(2,4)
+        level.hell:toggleWall(3,4)
       end,
       [4] = function(level, state)
-        level.earth:toggleWall(7,4)
+        level.earth:toggleWall(6,4)
       end,
       [5] = function(level, state)
         level.hell:toggleWall(4,6)
+      end,
+      [6] = function(level, state)
+        level.earth:toggleWall(7,3)
       end
     }
   }
