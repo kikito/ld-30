@@ -142,8 +142,10 @@ end
 
 function World:attemptMove(direction)
   if not self.active then return end
-  self.pusher:attemptMove(direction)
-  self.level:checkButtons()
+  if self.pusher:attemptMove(direction) then
+    self.level:checkButtons()
+    return true
+  end
 end
 
 function World:isWon()
@@ -230,8 +232,8 @@ function Level:draw()
 end
 
 function Level:attemptMove(direction)
-  self.earth:attemptMove(direction)
-  self.hell:attemptMove(direction)
+  return self.earth:attemptMove(direction)
+      or self.hell:attemptMove(direction)
 end
 
 function Level:isWon()

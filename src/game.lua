@@ -3,8 +3,7 @@ local Stateful = require 'lib.stateful'
 
 local Game = class('Game'):include(Stateful)
 
-function Game:initialize(media)
-  self.media = media
+function Game:initialize()
 end
 
 function Game:update(dt)

@@ -52,6 +52,11 @@ media.load = function()
     meta_ball    = newQuad(4,3, atlas),
     meta_pusher  = newQuad(1,3, atlas)
   }
+
+  media.fonts = {
+    ui  = love.graphics.newFont(18),
+    big = love.graphics.newFont(30)
+  }
 end
 
 media.cleanup = function()
