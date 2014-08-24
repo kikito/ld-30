@@ -5,14 +5,19 @@ local Intro = Game:addState('Intro')
 
 function Intro:draw()
   love.graphics.setFont(media.fonts.big)
-  love.graphics.print('Intro', 100,100)
+  love.graphics.setColor(255,255,255)
+  love.graphics.print('Earth, Hell and Space', 100,100)
+
+  love.graphics.setFont(media.fonts.ui)
+  love.graphics.print('Press any key to start. Esc exits', 100,300)
+
 end
 
 function Intro:keypressed(key)
-  if key == ' ' or key == 'enter' then
-    self:gotoState('Play')
-  elseif key == 'escape' then
+  if key == 'escape' then
     love.event.quit()
+  else
+    self:gotoState('Play')
   end
 end
 

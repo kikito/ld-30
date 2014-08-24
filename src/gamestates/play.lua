@@ -37,14 +37,23 @@ function Play:draw()
   love.graphics.rectangle('fill', w-text_width, h-text_height, text_width, text_height)
   love.graphics.setColor(255,255,255)
   love.graphics.print(self.steps, w - text_width, h - text_height)
+
+  local restart_msg = "R = restart level"
+  local text_width = font:getWidth(restart_msg)
+  love.graphics.print(restart_msg, w - text_width, h/2 - text_height)
+  love.graphics.print(restart_msg, w - text_width, h/2)
+
+  love.graphics.setColor(0,0,0)
+  love.graphics.print('Space = hell', 0, h/2 - text_height)
+  love.graphics.print('Space = earth', 0, h/2)
 end
 
 function Play:keypressed(key)
   if key == 'escape' then
     self:gotoState('Intro')
-  end
-
-  if key == 'up' or key == 'down' or key == 'right' or key == 'left' then
+  elseif key == 'r' then
+    self.level:restart()
+  elseif key == 'up' or key == 'down' or key == 'right' or key == 'left' then
     if self.level:attemptMove(key) then
       self.steps = self.steps + 1
       if self.level:isWon() then
@@ -56,9 +65,7 @@ function Play:keypressed(key)
         end
       end
     end
-  end
-
-  if key == ' ' or key == 'enter' or key == 'tab' then
+  else
     self.level:switchActiveWorld()
   end
 end

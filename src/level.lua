@@ -221,9 +221,8 @@ end
 local Level = class('Level')
 
 function Level:initialize(map)
-  self.earth = World:new(self, map.earth, 'earth', map.buttons)
-  self.hell = World:new(self, map.hell, 'hell', map.buttons)
-  self.earth.active = true
+  self.map = map
+  self:restart()
 end
 
 function Level:draw()
@@ -248,6 +247,14 @@ end
 function Level:checkButtons()
   self.earth:checkButtons()
   self.hell:checkButtons()
+end
+
+function Level:restart()
+  local map = self.map
+  self.earth, self.hell = nil, nil
+  self.earth = World:new(self, map.earth, 'earth', map.buttons)
+  self.hell = World:new(self, map.hell, 'hell', map.buttons)
+  self.earth.active = true
 end
 
 return Level

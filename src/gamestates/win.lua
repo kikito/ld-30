@@ -5,6 +5,7 @@ local media = require 'media'
 local Win = Game:addState('Win')
 
 function Win:draw()
+  love.graphics.setColor(255,255,255)
   love.graphics.setFont(media.fonts.big)
   love.graphics.print(self.win_msg, 100,100)
 end
