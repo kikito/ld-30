@@ -7,24 +7,26 @@ function Pusher:initialize(world, x, y)
   self.x, self.y = x,y
 end
 
-function Pusher:move(next_x, next_y)
-  self.x, self.y = next_x, next_y
+function Pusher:move(direction)
+  self.x, self.y = self.world:getNextCoordinate(self.x, self.y, direction)
   return true
 end
 
-function Pusher:attemptMove(direction)
+function Pusher:canMove(direction)
   local world = self.world
-
   local next_x, next_y = world:getNextCoordinate(self.x, self.y, direction)
 
   local ball = world:getBall(next_x, next_y)
+  if ball then return ball:canMove(direction) end
+  return world:isTraversable(next_x, next_y)
+end
 
-  if ball then
-    if ball:attemptMove(direction) then
-      return self:move(next_x, next_y)
-    end
-  elseif world:isTraversable(next_x, next_y) then
-    return self:move(next_x, next_y)
+function Pusher:attemptMove(direction)
+  if self:canMove(direction) then
+    self:move(direction)
+    local ball = self.world:getBall(self.x, self.y)
+    if ball then ball:move(direction) end
+    return true
   end
 end
 
