@@ -18,7 +18,7 @@ end
 
 media.load = function()
   local names = [[
-    step
+    step button goal roll cant switch win game-win
   ]]
 
   media.sfx = {}

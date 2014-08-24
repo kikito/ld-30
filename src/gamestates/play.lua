@@ -51,19 +51,24 @@ end
 function Play:keypressed(key)
   if key == 'escape' then
     self:gotoState('Intro')
+    media.sfx.cant:play()
   elseif key == 'r' then
+    media.sfx.cant:play()
     self.level:restart()
   elseif key == 'up' or key == 'down' or key == 'right' or key == 'left' then
     if self.level:attemptMove(key) then
       self.steps = self.steps + 1
       if self.level:isWon() then
         if self:hasNextLevel() then
+          media.sfx.win:play()
           self.level_index = self.level_index + 1
           self:loadLevel()
         else
           self:gotoState('Win')
         end
       end
+    else
+      media.sfx.cant:play()
     end
   else
     self.level:switchActiveWorld()

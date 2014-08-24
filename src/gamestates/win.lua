@@ -11,11 +11,13 @@ function Win:draw()
 end
 
 function Win:enteredState()
+  media.sfx['game-win']:play()
+
   self.win_msg = "You won!"
 
   self.scoreClock = cron.after(1, function()
     self.win_msg = self.win_msg ..
-      "\n\nYou finished in " .. self.steps .. " steps."
+      "\n\nYou finished in " .. self.steps  .. " steps."
   end)
 
   self.exitClock = cron.after(3, function()

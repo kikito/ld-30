@@ -1,4 +1,5 @@
 local class = require 'lib.middleclass'
+local media = require 'media'
 
 local Ball = class('Ball')
 
@@ -8,7 +9,14 @@ function Ball:initialize(world, x, y)
 end
 
 function Ball:move(direction)
-  self.x, self.y = self.world:getNextCoordinate(self.x, self.y, direction)
+  local world = self.world
+  self.x, self.y = world:getNextCoordinate(self.x, self.y, direction)
+  media.sfx.roll:play()
+
+  if world:isGoal(self.x, self.y) then
+    media.sfx.goal:play()
+  end
+
 end
 
 function Ball:canMove(direction)

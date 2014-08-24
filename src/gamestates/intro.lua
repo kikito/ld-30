@@ -18,6 +18,7 @@ function Intro:keypressed(key)
     love.event.quit()
   else
     self:gotoState('Play')
+    media.sfx.win:play()
   end
 end
 

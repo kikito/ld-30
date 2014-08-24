@@ -179,6 +179,10 @@ function World:getBall(x,y)
   end
 end
 
+function World:isGoal(x,y)
+  return self.cells[y][x] == 'X'
+end
+
 function World:isTraversable(x,y)
   if self:isOut(x,y) then return false end
   local char = self.cells[y][x]
@@ -243,6 +247,7 @@ function Level:isWon()
 end
 
 function Level:switchActiveWorld()
+  media.sfx.switch:play()
   self.earth.active = not self.earth.active
   self.hell.active = not self.hell.active
 end
