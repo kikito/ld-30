@@ -25,10 +25,10 @@ return {
 .@.1..
 ......
 ]],
-    buttons = function(button, state)
-      if button == "1" then
-        print('FIXME: button 1 ' .. state)
+    buttons = {
+      function(level, state)
+        level.earth:toggleWall(5,3)
       end
-    end
+    }
   }
 }

@@ -2,6 +2,7 @@ local class = require 'lib.middleclass'
 local media = require 'media'
 local Pusher = require 'pusher'
 local Ball   = require 'ball'
+local Button = require 'button'
 
 
 local TILE_WIDTH, TILE_HEIGHT = 32, 32
@@ -12,7 +13,7 @@ local charQuadTranslation = {
     ['.'] = 'ground',
     ['#'] = 'wall',
     ['O'] = 'ball',
-    ['1'] = 'button',
+    ['_'] = 'button',
     ['X'] = 'goal'
   },
   hell = {
@@ -20,7 +21,7 @@ local charQuadTranslation = {
     ['.'] = 'hell_ground',
     ['#'] = 'hell_wall',
     ['O'] = 'hell_ball',
-    ['1'] = 'hell_button',
+    ['_'] = 'hell_button',
     ['X'] = 'hell_goal'
   }
 }
@@ -61,13 +62,15 @@ end
 
 local World = class('World')
 
-function World:initialize(world_data, region)
+function World:initialize(level, world_data, region, button_callbacks)
+  self.level = level
   self.region = region
   self.width = world_data.width
   self.height = world_data.height
 
   self.cells = {}
   self.balls = {}
+  self.buttons = {}
 
   for y=1, self.height do
     self.cells[y] = {}
@@ -80,6 +83,10 @@ function World:initialize(world_data, region)
       elseif char == 'O' then
         self.balls[#self.balls + 1] = Ball:new(self, x, y)
         char = '.'
+      elseif tonumber(char) then
+        local callback = assert(button_callbacks[tonumber(char)], 'missing button callback: '.. char)
+        self.buttons[#self.buttons + 1] = Button:new(self, x, y, callback)
+        char = '_'
       end
       self.cells[y][x] = char
     end
@@ -124,7 +131,9 @@ end
 
 function World:attemptMove(direction)
   if not self.active then return end
-  self.pusher:attemptMove(direction)
+  if self.pusher:attemptMove(direction) then
+    self:checkButtons()
+  end
 end
 
 function World:isWon()
@@ -156,11 +165,37 @@ function World:isTraversable(x,y)
   return char ~= '#'
 end
 
+function World:checkButtons()
+  local button
+  local pusher = self.pusher
+  for i=1, #self.buttons do
+    button = self.buttons[i]
+    if button.x == pusher.x and button.y == pusher.y
+       or self:getBall(button.x, button.y)
+    then
+      button:press()
+    else
+      button:release()
+    end
+  end
+end
+
+function World:toggleWall(x,y)
+  local char = self.cells[y][x]
+  if char == '.' then
+    self.cells[y][x] = '#'
+  elseif char == '#' then
+    self.cells[y][x] = '.'
+  else
+    error('can not toggle wall ' .. x ..','.. y .. ': invalid char - ' .. char)
+  end
+end
+
 local Level = class('Level')
 
 function Level:initialize(map)
-  self.earth = World:new(map.earth, 'earth')
-  self.hell = World:new(map.hell, 'hell')
+  self.earth = World:new(self, map.earth, 'earth', map.buttons)
+  self.hell = World:new(self, map.hell, 'hell', map.buttons)
   self.earth.active = true
 end
 
