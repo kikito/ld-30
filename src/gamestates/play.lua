@@ -1,10 +1,23 @@
-local Game = require 'game'
+local Game  = require 'game'
 local Level = require 'level'
+local Map   = require 'map'
+local maps  = require 'maps'
 
 local Play = Game:addState('Play')
 
+function Play:hasNextLevel()
+  return self.level_index < #maps
+end
+
+function Play:loadLevel()
+  local map_data = maps[self.level_index]
+  local map = Map:new(map_data)
+  self.level = Level:new(map)
+end
+
 function Play:enteredState()
-  self.level = Level:new(self.media.maps.map1)
+  self.level_index = 1
+  self:loadLevel()
 end
 
 function Play:draw()
@@ -19,7 +32,12 @@ function Play:keypressed(key)
   if key == 'up' or key == 'down' or key == 'right' or key == 'left' then
     self.level:attemptMove(key)
     if self.level:isWon() then
-      self:gotoState('Win')
+      if self:hasNextLevel() then
+        self.level_index = self.level_index + 1
+        self:loadLevel()
+      else
+        self:gotoState('Win')
+      end
     end
   end
 

@@ -25,12 +25,10 @@ local function parseWorldString(str)
   return result
 end
 
-function Map:initialize(path)
-  local info = love.filesystem.load(path)()
-
-  self.earth = parseWorldString(info.earth)
-  self.hell = parseWorldString(info.hell)
-  self.buttons = info.buttons
+function Map:initialize(map_data)
+  self.earth    = parseWorldString(map_data.earth)
+  self.hell     = parseWorldString(map_data.hell)
+  self.buttons  = map_data.buttons
 end
 
 return Map

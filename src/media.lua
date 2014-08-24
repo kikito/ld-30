@@ -50,10 +50,6 @@ media.load = function()
     hell_button  = newQuad(5,2, atlas),
     hell_goal    = newQuad(6,2, atlas)
   }
-
-  media.maps = {
-    map1 = Map:new('maps/map1.lua')
-  }
 end
 
 media.cleanup = function()
