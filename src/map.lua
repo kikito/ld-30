@@ -3,6 +3,8 @@ local class = require 'lib.middleclass'
 local Map = class('Map')
 
 local function parseWorldString(str)
+  str = str:gsub(' ', '')
+
   local result = {cells = {}}
 
   local width = #(str:match("[^\n]+"))
