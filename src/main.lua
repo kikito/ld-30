@@ -10,6 +10,8 @@ local game
 
 function love.load()
   media.load()
+  media.music:play()
+
   game = Game:new()
   game:gotoState('Intro')
 end

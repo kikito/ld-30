@@ -26,10 +26,8 @@ media.load = function()
     media.sfx[name] = newSource(name)
   end
 
-  --[[
-  media.music = love.audio.newSource('sfx/music.fm')
+  media.music = love.audio.newSource('sfx/life-in-the-80s.ogg')
   media.music:setLooping(true)
-  ]]
 
   local atlas = love.graphics.newImage('img/atlas.png')
   media.img = {
