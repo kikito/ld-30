@@ -1,4 +1,5 @@
-# Earth, Hell & Spacek
+# Earth, Hell & Space
+
 ### A game made for [Ludum Dare #30](http://www.ludumdare.com/compo/ludum-dare-30/)
 
 This is my Entry for the Ludum Dare compo, themed "Connected Worlds"
