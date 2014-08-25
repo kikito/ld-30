@@ -54,7 +54,7 @@ media.load = function()
   }
 
   media.fonts = {
-    ui  = love.graphics.newFont(18),
+    ui  = love.graphics.newFont(17),
     big = love.graphics.newFont(30)
   }
 end
