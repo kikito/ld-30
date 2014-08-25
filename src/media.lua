@@ -31,7 +31,9 @@ media.load = function()
 
   local atlas = love.graphics.newImage('img/atlas.png')
   media.img = {
-    atlas = atlas
+    atlas = atlas,
+    intro = love.graphics.newImage('img/intro.png'),
+    win   = love.graphics.newImage('img/win.png')
   }
 
   media.quads = {
